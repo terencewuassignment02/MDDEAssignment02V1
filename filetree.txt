@@ -1,0 +1,6 @@
+index.html
+suazure.html
+sugithub.html
+suwhyboth.html
+suchatbot.html
+suupdatelogic.html
