@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/mainContent.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Terence's MDDE610 Assignment 02</title>
+<!-- InstanceEndEditable -->
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<style type="text/css">
+<!--
+.style14 {font-family: Arial, Helvetica, sans-serif}
+-->
+</style>
+</head>
+
+<!-- Floating chatbot (all in-page) -->
+
+<style>
+#chatbot {position:fixed;bottom:80px;right:20px;width:240px;background:#fff;
+border:1px solid #444;border-radius:8px;display:none;font-family:Arial;z-index:9999;}
+#chatHeader {background:#333;color:#fff;padding:6px;font-weight:bold;
+border-radius:8px 8px 0 0;}
+#chatMessages {height:150px;overflow-y:auto;padding:6px;font-size:13px;}
+#chatInputArea {padding:6px;}
+#chatInput {width:70%;}
+#chatToggle {position:fixed;bottom:20px;right:20px;background:#333;color:#fff;
+padding:8px 12px;border-radius:50px;cursor:pointer;z-index:9999;}
+.style7 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 24px;
+}
+.style13 {font-family: Arial, Helvetica, sans-serif; font-size: 16px; color: #FFFFFF; }
+.style15 {color: #FFFFFF}
+.style16 {
+	font-size: 16px;
+	color: #FFFFFF;
+}
+.style17 {font-size: 16px}
+.style18 {color: #FFFFFF; font-family: Arial, Helvetica, sans-serif; }
+</style>
+
+
+<div id="chatbot">
+  <div id="chatHeader">Chatbot</div>
+  <div id="chatMessages"></div>
+
+  <div id="chatInputArea">
+    <input id="chatInput" type="text" />
+    <button onclick="sendMsg()">Send</button>
+    <button onclick="clearChat()">Clear</button>
+  </div>
+</div>
+
+<div id="chatToggle" onclick="toggleChat()">Chat</div>
+
+
+
+<script>
+// Load saved chat history safely
+let history = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+
+// Creating a Terence Section
+let talkingAboutTerence = false;
+
+// Simple rule-based chatbot logic
+function myLogic(msg) {
+  msg = msg.toLowerCase();
+  
+  // Exit Terence conversation
+  if (talkingAboutTerence) {
+    if (
+      msg.includes("stop") ||
+      msg.includes("exit") ||
+      msg.includes("done") ||
+      msg.includes("change topic") ||
+      msg.includes("no more")
+    ) {
+      talkingAboutTerence = false;
+      return "Alright, switching topics";
+    }}
+
+
+  // Start Terence conversation
+  if (msg.includes("tell me") && (msg.includes("terence") || msg.includes("him"))) {
+    talkingAboutTerence = true;
+    return "Sure - I know his hobbies, work, and favourite food";
+  }
+
+  // Follow-ups while talking about Terence
+  if (talkingAboutTerence) {
+    if (msg.includes("hobbies") || msg.includes("hobby")) {
+      return "Terence likes to fly to local airports in his Cesna 172.";
+    }
+
+    // You can add more Terence facts here
+	if (msg.includes("work") || msg.includes("worked")) {
+      return "Terence has worked in various industries giving him a large knowledge base, but he jumps on opportuniteis to learn even more new things ";
+    }
+    if (msg.includes("food") || msg.includes("to eat")) {
+      return "Terence likes to eat ice cream";
+    }
+	
+  }
+
+  // Your existing logic
+  if (msg.includes("hello")) return "Hi there!";
+  if (msg.includes("your name")) return "I don't have a name yet.";
+  if (msg.includes("help")) return "I can answer simple questions.";
+  if (msg.includes("azure")) return "Microsoft Azure is a cloud computing platform that provides on-demand services like storage, servers, databases, and AI tools so organizations can build and run applications without managing physical hardware.";
+  if (msg.includes("github")) return "GitHub is an online platform where people store code, track changes, collaborate on projects, and share software using version control tools like Git.";
+  
+  return "I'm still learning.";
+}
+
+// Open/close the chatbot and remember the state
+function toggleChat() {
+  const box = document.getElementById("chatbot");
+  const isOpen = box.style.display === "block";
+  box.style.display = isOpen ? "none" : "block";
+  localStorage.setItem("chatOpen", isOpen ? "closed" : "open");
+}
+
+// Add a message to the chat window AND save it
+function addMsg(sender, text) {
+  const box = document.getElementById("chatMessages");
+
+  const line = document.createElement("div");
+  line.textContent = sender + ": " + text;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+
+  // Save to history in a clean format
+  history.push({ sender: sender, text: text });
+  localStorage.setItem("chatHistory", JSON.stringify(history));
+}
+
+// Send a message
+function sendMsg() {
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMsg("You", text);
+  addMsg("Bot", myLogic(text));
+
+  input.value = "";
+}
+
+// Restore everything on page load
+window.onload = () => {
+  // Restore open/closed state
+  const saved = localStorage.getItem("chatOpen");
+  document.getElementById("chatbot").style.display =
+    saved === "open" ? "block" : "none";
+
+  // Restore conversation history WITHOUT saving again
+  const box = document.getElementById("chatMessages");
+
+  history.forEach(m => {
+    if (!m || !m.sender || !m.text) return; // skip corrupted entries
+    const line = document.createElement("div");
+    line.textContent = m.sender + ": " + m.text;
+    box.appendChild(line);
+  });
+};
+
+function clearChat() {
+  localStorage.removeItem("chatHistory");
+  history = [];
+  document.getElementById("chatMessages").innerHTML = "";
+}
+
+
+
+</script>
+
+<body>
+<table width="1100" border="0" cellspacing="0" cellpadding="8">
+  <tr>
+    <td colspan="2"><span class="style7">Terence's MDDE610 Assignment 02 | Self Learning Through Technology </span></td>
+  </tr>
+  <tr>
+    <td colspan="2" bgcolor="#5880AF"><span class="style13">version 2026.02.10.6.24</span></td>
+  </tr>
+  
+  
+<tr>
+  <td width="190" align="left" valign="top" bgcolor="#333333"><a href="../index.html" class="style13 style14 style15">Home</a></td>
+
+  <!-- Setup Webpage -->
+  <td width="878" rowspan="18" align="left" valign="top" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="MainContent" -->
+    <table width="900" border="0" cellspacing="0" cellpadding="3">
+      <tr>
+        <td colspan="2"><span class="style14"><b>Updating the Logic</b></span></td>
+      </tr>
+      <tr>
+        <td colspan="2"><span class="style14">For this part, I wanted to create a sub logic model that triggers, when someone asks about Terence. The (talkingAboutTerence) function would engage if the user typed a sentance containing &quot;tell me&quot; and either &quot;Terence&quot; or &quot;Him.&quot; The case would not matter because a previous function changed every response to lowercase. </span></td>
+      </tr>
+      <tr>
+        <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr>
+        <td colspan="2"><img src="../updatelogic.jpg" width="875" height="705" /></td>
+      </tr>
+      <tr>
+        <td colspan="2">&nbsp;</td>
+      </tr>
+      <tr>
+        <td width="43"><img src="one.jpg" width="43" height="41" /></td>
+        <td width="845" align="left" valign="top"><span class="style14">This is the existing logic and it handles basic responses and cannot go into a sub topic with its own logic.</span></td>
+      </tr>
+      <tr>
+        <td><img src="two.jpg" width="42" height="41" /></td>
+        <td align="left" valign="top"><span class="style14">This line sets the conditions to make (talkingAboutTerence) = true if someone types in &quot;Tell me&quot; and &quot;Terence&quot; or &quot;Him.&quot; </span></td>
+      </tr>
+      <tr>
+        <td><img src="three.jpg" width="40" height="41" /></td>
+        <td align="left" valign="top"><span class="style14">Once the (talkingAboutTerence) function is triggers, we enter the section where we can update logic as if were entering it into the existing logic. The only differnce is that the logic model will be based on things we difine to Terence. </span></td>
+      </tr>
+    </table>
+  <!-- InstanceEndEditable --></td>
+
+  <!-- Setup Chatbot -->
+  </tr>
+<tr align="left" valign="top" bgcolor="#333333">
+  <td><span class="style14 style15">Learning Process</span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style17 style15">1. <a href="mslearn.html">Microsoft Learn</a> </span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style17 style15">&nbsp;&nbsp;&nbsp;&nbsp;1.1 <a href="mslearnai.html">AI </a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style17 style15">&nbsp;&nbsp;&nbsp;&nbsp;1.2 <a href="mslearnazure.html">Azure </a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style17 style15">&nbsp;&nbsp;&nbsp;&nbsp;1.3 <a href="mslearncopilot.html">Copilot </a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td bgcolor="#333333"><span class="style13">Implementation</span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style13">2. Webpage</span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style13 style14 style15">&nbsp;&nbsp;&nbsp;&nbsp;2.1 <a href="azure.html">Microsoft Azure</a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style16">&nbsp;&nbsp;&nbsp;&nbsp;2.2 <a href="github.html">GitHub</a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style17">&nbsp;&nbsp;&nbsp;&nbsp;<span class="style15">2.3</span> <span class="style15"><a href="whyuseboth.html">Why use both?  </a></span></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style15">3. Chatbot
+    </span>
+    <div class="style14 style15" id="layer2" 
+           style="display:none; position:absolute; left:0; top:20px; background:#008ACC; border:1px solid #fff; padding:5px;"> </div></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style15">&nbsp;&nbsp;&nbsp;&nbsp;3.1 <a href="setupchatbot.html">Setup Chatbot </a></span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td><span class="style14 style15">&nbsp;&nbsp;&nbsp;&nbsp;3.2&nbsp;<a href="updatelogic.html">Update Logic</a> </span></td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td>&nbsp;&nbsp;&nbsp; <span class="style18">3.3</span>&nbsp;<span class="style13"><a href="troubleshoot.html">Trouble Shooting</a></span> </td>
+</tr>
+<tr align="left" valign="top" bgcolor="#999999">
+  <td height="29" bgcolor="#333333"><span class="style13"><a href="reference.html">References</a></span></td>
+</tr>
+<tr bgcolor="#999999">
+  <td height="253" align="left" valign="top"><img src="../Template.jpg" width="72" height="1500" /></td>
+</tr>
+<tr bgcolor="#999999">
+  <td>&nbsp;</td>
+</tr>
+</table>
+</body>
+<!-- InstanceEnd --></html>
